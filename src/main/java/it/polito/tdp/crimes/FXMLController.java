@@ -5,9 +5,19 @@
 package it.polito.tdp.crimes;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.DefaultWeightedEdge;
+
+import it.polito.tdp.crimes.model.District;
 import it.polito.tdp.crimes.model.Model;
+import it.polito.tdp.crimes.model.Vicino;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,6 +27,9 @@ import javafx.scene.control.TextField;
 
 public class FXMLController {
 	private Model model;
+	Graph<District, DefaultWeightedEdge> grafo;
+
+	private boolean grafoCreato = false;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -25,7 +38,7 @@ public class FXMLController {
     private URL location;
 
     @FXML // fx:id="boxAnno"
-    private ComboBox<?> boxAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxMese"
     private ComboBox<?> boxMese; // Value injected by FXMLLoader
@@ -47,7 +60,34 @@ public class FXMLController {
 
     @FXML
     void doCreaReteCittadina(ActionEvent event) {
-
+    	Integer anno = this.boxAnno.getValue();
+    	if(anno == null) {
+    		txtResult.setText("seleziona un anno plis");
+    	
+    	}else {
+    		this.model.creaGrafo(anno);
+    		
+    		this.grafo = this.model.getGrafo();
+    		this.grafoCreato = true;
+    		
+    		txtResult.setText("GRAFO CREATO");
+    		txtResult.appendText("\nvertici: "+this.grafo.vertexSet().size());
+    		txtResult.appendText("\narchi: "+this.grafo.edgeSet().size());
+    		
+    		for(District d : this.grafo.vertexSet()) {
+    			txtResult.appendText("\n\nVICINI PER IL DISTRETTO: "+d.getDistrictId());
+    			List<Vicino> vicini = new LinkedList<>();
+    			for(District v : Graphs.neighborListOf(this.grafo, d)) {
+    				Vicino vi= new Vicino(v, this.grafo.getEdgeWeight(this.grafo.getEdge(v, d)));
+    				vicini.add(vi);
+    			}
+    			Collections.sort(vicini);
+    			for(Vicino v : vicini) {
+    				txtResult.appendText("\n"+v.toString());
+    			}
+    		}
+    	}
+    	
     }
 
     @FXML
@@ -69,5 +109,8 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	this.boxAnno.getItems().clear();
+    	this.boxAnno.getItems().addAll(this.model.getYears());
     }
 }
