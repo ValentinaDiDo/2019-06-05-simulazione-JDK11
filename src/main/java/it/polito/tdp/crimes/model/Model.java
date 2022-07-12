@@ -57,4 +57,26 @@ public class Model {
 	}
 	
 	
+	public void simula(int anno, int mese, int giorno, int agenti) {
+		List<DistrettiCrimini> crimini = this.dao.getDistrettoMenoCrimini(anno);
+		
+		int min = Integer.MAX_VALUE;
+		int idDistretto = 0;
+		for(DistrettiCrimini dc : crimini) {
+			if(dc.getNumeroCrimini() < min) {
+				min = dc.getNumeroCrimini();
+				idDistretto = dc.getDistrictID();
+			}
+		}
+		
+		District centrale = null;
+		
+		for(District d : this.distretti) {
+			if(d.getDistrictId() == idDistretto)
+				centrale = d;
+		}
+		
+		List<Event> criminiGiorno = this.dao.getEventiGiorno(anno, mese, giorno);
+		
+	}
 }

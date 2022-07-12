@@ -41,10 +41,10 @@ public class FXMLController {
     private ComboBox<Integer> boxAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxMese"
-    private ComboBox<?> boxMese; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxGiorno"
-    private ComboBox<?> boxGiorno; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxGiorno; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnCreaReteCittadina"
     private Button btnCreaReteCittadina; // Value injected by FXMLLoader
@@ -86,13 +86,63 @@ public class FXMLController {
     				txtResult.appendText("\n"+v.toString());
     			}
     		}
+    		
+    		this.boxMese.getItems().clear();
+    		for(int i=1; i<=12; i++) {
+    			this.boxMese.getItems().add(i);
+    		}
+    		this.boxGiorno.getItems().clear();
+    		for(int i=1; i<=31; i++) {	
+    			this.boxGiorno.getItems().add(i);
+    		}
+    		
     	}
     	
     }
 
     @FXML
     void doSimula(ActionEvent event) {
-
+    	if(this.grafoCreato == false) {
+    		txtResult.setText("DEVI PRIMA CREARE IL GRAFO BRO\n");
+    	}else {
+    		int mese = this.boxMese.getValue();
+    		int giorno = this.boxGiorno.getValue();
+    		int anno = this.boxAnno.getValue();
+    		String n = this.txtN.getText();
+    		if(this.boxMese.getValue().equals(null) ||this.boxGiorno.getValue().equals(null) || this.boxAnno.getValue().equals(null) || n.equals("") ) {
+    			txtResult.appendText("COMPLETA TUTTI I CAMPI");
+    		}else {
+    			
+    			if(mese == 4 || mese == 6 || mese == 9 || mese == 11) {
+    				if(giorno == 31) {
+    					txtResult.appendText("\nil giono può essere max 30");
+    				}
+    			}else if(mese == 2) {
+    				if( giorno <28) {
+    					txtResult.appendText("\nfebbraio ha solo 28 giorni bro");
+    				}
+    			}else {
+    				txtResult.appendText("\nData valida");
+    				
+    				try {
+    					int agenti = Integer.parseInt(n);
+    					if(agenti<1 || agenti>10) {
+    						txtResult.appendText("\ninserisci numero compreso tra 1 e 10");
+    					}else {
+    						
+    						this.model.simula(anno, mese, giorno, agenti);
+    					}
+    					
+    				}catch(NumberFormatException e) {
+    					e.printStackTrace();
+    					txtResult.appendText("\ninserisci solo campi numerici");
+    				}
+    				
+    				
+    			}
+    		}
+    		
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
